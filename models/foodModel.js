@@ -5,11 +5,11 @@ const foodSchema = new mongoose.Schema({
   description: { type: String },
   price: [
     {
-      amount: { type: Number, required: true },
-      weight: { type: String, required: true },
+      amount: { type: Number, required: true }, // Ціна
+      weight: { type: String, required: true }, // Вага (наприклад "300g")
     },
   ],
-  image: { type: String, required: true }, // base64
+  image: { type: String, required: true },
   category: { type: String, required: true },
 });
 
