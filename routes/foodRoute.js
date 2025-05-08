@@ -1,19 +1,21 @@
-import express from "express";
-import multer from "multer";
-import {
-  addFood,
-  listFood,
-  removeFoodItem,
-} from "../controllers/foodController.js";
+import express from 'express';
+import multer from 'multer';
+import { addFood, listFood, removeFoodItem } from '../controllers/foodController.js';
 
 const foodRouter = express.Router();
 
-// Зберігаємо файл в пам'яті (а не на диск)
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
+// Image Storage Engine
+const storage = multer.diskStorage({
+  destination: "uploads",
+  filename: (req, file, cb) => {
+    return cb(null, `${Date.now()}${file.originalname}`);
+  }
+});
 
-foodRouter.post("/add", upload.single("image"), addFood);
-foodRouter.get("/list", listFood);
-foodRouter.delete("/remove", removeFoodItem);
+const upload = multer({ storage: storage });
+
+foodRouter.post('/add', upload.single("image"), addFood);
+foodRouter.get('/list', listFood);
+foodRouter.delete('/remove', removeFoodItem);
 
 export default foodRouter;
