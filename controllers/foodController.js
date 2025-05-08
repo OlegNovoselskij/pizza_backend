@@ -1,5 +1,4 @@
-import fs from "fs";
-import foodModel from "../models/foodModel.js";
+  import foodModel from "../models/foodModel.js";
 
 // Додавання їжі
 const addFood = async (req, res) => {
@@ -9,13 +8,14 @@ const addFood = async (req, res) => {
       .json({ success: false, message: "No file uploaded" });
   }
 
-  let image_filename = req.file.filename;
+  let imageBase64 = `data:${
+    req.file.mimetype
+  };base64,${req.file.buffer.toString("base64")}`;
 
   let price = [];
 
-  // Очікуємо що в body прийде масив об'єктів для price
   try {
-    price = JSON.parse(req.body.price); // бо формдата передає як стрічку
+    price = JSON.parse(req.body.price);
   } catch (error) {
     return res
       .status(400)
@@ -25,9 +25,9 @@ const addFood = async (req, res) => {
   const food = new foodModel({
     name: req.body.name,
     description: req.body.description,
-    price: price, // тут буде масив [{amount: 100, weight: "300g"}, ...]
+    price: price,
     category: req.body.category,
-    image: image_filename,
+    image: imageBase64, // зберігаємо base64
   });
 
   try {
@@ -35,7 +35,7 @@ const addFood = async (req, res) => {
     res.json({ success: true, message: "Food added" });
   } catch (error) {
     console.error(error);
-    res.json({ success: false, message: "Failed to add" });
+    res.status(500).json({ success: false, message: "Failed to add" });
   }
 };
 
@@ -46,7 +46,7 @@ const listFood = async (req, res) => {
     res.json({ success: true, data: foods });
   } catch (error) {
     console.log(error);
-    res.json({ success: false, message: error });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -55,7 +55,6 @@ const removeFoodItem = async (req, res) => {
   try {
     const food = await foodModel.findById(req.body.id);
     if (food) {
-      fs.unlink(`uploads/${food.image}`, () => {});
       await foodModel.findByIdAndDelete(req.body.id);
       res.json({ success: true, message: "Food removed" });
     } else {
@@ -63,7 +62,7 @@ const removeFoodItem = async (req, res) => {
     }
   } catch (error) {
     console.log(error);
-    res.json({ success: false, message: error });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
