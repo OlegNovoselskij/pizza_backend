@@ -4,11 +4,14 @@ import { addFood, listFood, removeFoodItem } from '../controllers/foodController
 
 const foodRouter = express.Router();
 
-// Image Storage Engine
+import path from "path";
+
 const storage = multer.diskStorage({
   destination: "/mnt/data/uploads",
   filename: (req, file, cb) => {
-    return cb(null, `${Date.now()}${file.originalname}`);
+    const ext = path.extname(file.originalname); // розширення .jpg
+    const cleanName = Date.now() + ext; // без кракозябр
+    cb(null, cleanName);
   }
 });
 
